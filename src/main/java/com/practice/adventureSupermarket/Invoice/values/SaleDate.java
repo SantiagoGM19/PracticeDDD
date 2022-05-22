@@ -1,4 +1,11 @@
 package com.practice.adventureSupermarket.Invoice.values;
 
-public class SaleDate {
+import co.com.sofka.domain.generic.ValueObject;
+
+public class SaleDate implements ValueObject<String> {
+
+    @Override
+    public String value() {
+        return null;
+    }
 }

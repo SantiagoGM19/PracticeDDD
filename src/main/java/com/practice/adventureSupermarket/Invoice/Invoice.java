@@ -1,4 +1,67 @@
 package com.practice.adventureSupermarket.Invoice;
 
-public class Invoice {
+import co.com.sofka.domain.generic.AggregateEvent;
+import com.practice.adventureSupermarket.Invoice.events.*;
+import com.practice.adventureSupermarket.Invoice.values.*;
+import com.practice.adventureSupermarket.ProductDetail.Manufacturer;
+import com.practice.adventureSupermarket.ProductDetail.Product;
+import com.practice.adventureSupermarket.ProductDetail.ProductDetail;
+import com.practice.adventureSupermarket.ProductDetail.values.Amount;
+import com.practice.adventureSupermarket.ProductDetail.values.Description;
+import com.practice.adventureSupermarket.ProductDetail.values.ProductDetailId;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+public class Invoice extends AggregateEvent<InvoiceId> {
+
+    protected Set<ProductDetail> productsDetail;
+    protected CustomerId customerId;
+    protected SellerId sellerId;
+    protected SaleDate saleDate;
+    protected TotalAmount totalAmount;
+
+    public Invoice(InvoiceId entityId, SaleDate saleDate) {
+        super(entityId);
+        appendChange(new InvoiceCreated(saleDate)).apply();
+    }
+
+    public void addProductDetail(ProductDetailId productDetailId, Description description, Amount amount){
+        Objects.requireNonNull(productDetailId, "The product detail id is null, It is required");
+        Objects.requireNonNull(description, "The description is null, It is required");
+        Objects.requireNonNull(amount, "The amount is null, It is required");
+        appendChange(new ProductDetailAdded(productDetailId, description, amount)).apply();
+    }
+
+    public void updateCustomerId(CustomerId customerId){
+        Objects.requireNonNull(customerId, "The customer id can not be null, It is required");
+        appendChange(new CustomerIdUpdated(customerId)).apply();
+    }
+
+    public void updateSellerId(SellerId sellerId){
+        Objects.requireNonNull(sellerId, "The seller can not be null, It is required");
+        appendChange(new SellerIdUpdated(sellerId)).apply();
+    }
+
+    public void updateSaleDate(SaleDate saleDate){
+        Objects.requireNonNull(saleDate, "The sale date can not be null, It is required");
+        appendChange(new SaleDateUpdated(saleDate)).apply();
+    }
+
+    public void updateTotalAmount(TotalAmount totalAmount){
+        Objects.requireNonNull(totalAmount, "The total amount can not be null, It must be 0 or more");
+        appendChange(new TotalAmountUpdated(totalAmount)).apply();
+    }
+
+    public Set<ProductDetail> productsDetail(){
+        return productsDetail;
+    }
+    
+    public Optional<ProductDetail> getProductDetailById(ProductDetailId entityId){
+        return productsDetail()
+                .stream()
+                .filter(productDetail -> productDetail.identity().equals(entityId))
+                .findFirst();
+    }
 }
