@@ -4,8 +4,6 @@ import co.com.sofka.domain.generic.AggregateEvent;
 import co.com.sofka.domain.generic.DomainEvent;
 import com.practice.adventureSupermarket.Invoice.events.*;
 import com.practice.adventureSupermarket.Invoice.values.*;
-import com.practice.adventureSupermarket.ProductDetail.Manufacturer;
-import com.practice.adventureSupermarket.ProductDetail.Product;
 import com.practice.adventureSupermarket.ProductDetail.ProductDetail;
 import com.practice.adventureSupermarket.ProductDetail.values.Amount;
 import com.practice.adventureSupermarket.ProductDetail.values.Description;
