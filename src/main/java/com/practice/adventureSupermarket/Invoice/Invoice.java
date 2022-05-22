@@ -1,6 +1,7 @@
 package com.practice.adventureSupermarket.Invoice;
 
 import co.com.sofka.domain.generic.AggregateEvent;
+import co.com.sofka.domain.generic.DomainEvent;
 import com.practice.adventureSupermarket.Invoice.events.*;
 import com.practice.adventureSupermarket.Invoice.values.*;
 import com.practice.adventureSupermarket.ProductDetail.Manufacturer;
@@ -10,6 +11,7 @@ import com.practice.adventureSupermarket.ProductDetail.values.Amount;
 import com.practice.adventureSupermarket.ProductDetail.values.Description;
 import com.practice.adventureSupermarket.ProductDetail.values.ProductDetailId;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -22,9 +24,20 @@ public class Invoice extends AggregateEvent<InvoiceId> {
     protected SaleDate saleDate;
     protected TotalAmount totalAmount;
 
-    public Invoice(InvoiceId entityId, SaleDate saleDate) {
+    public Invoice(InvoiceId entityId, SaleDate saleDate, TotalAmount totalAmount) {
         super(entityId);
-        appendChange(new InvoiceCreated(saleDate)).apply();
+        appendChange(new InvoiceCreated(saleDate, totalAmount)).apply();
+    }
+
+    private Invoice(InvoiceId entityId){
+        super(entityId);
+        subscribe(new InvoiceChange(this));
+    }
+
+    public static Invoice from(InvoiceId invoiceId, List<DomainEvent> events){
+        var invoice = new Invoice(invoiceId);
+        events.forEach(invoice::applyEvent);
+        return invoice;
     }
 
     public void addProductDetail(ProductDetailId productDetailId, Description description, Amount amount){
