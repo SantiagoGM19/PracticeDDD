@@ -1,6 +1,7 @@
 package com.practice.adventureSupermarket.Account;
 
 import co.com.sofka.domain.generic.AggregateEvent;
+import co.com.sofka.domain.generic.DomainEvent;
 import com.practice.adventureSupermarket.Account.events.AccountCreated;
 import com.practice.adventureSupermarket.Account.events.AccountNumberUpdated;
 import com.practice.adventureSupermarket.Account.events.SubscriptionCardIdUpdated;
@@ -10,6 +11,7 @@ import com.practice.adventureSupermarket.Account.values.AccountNumber;
 import com.practice.adventureSupermarket.Account.values.SubscriptionCardId;
 import com.practice.adventureSupermarket.Account.values.UserId;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Account extends AggregateEvent<AccountId> {
@@ -22,6 +24,17 @@ public class Account extends AggregateEvent<AccountId> {
     public Account(AccountId entityId, AccountNumber accountNumber) {
         super(entityId);
         appendChange(new AccountCreated(accountNumber)).apply();
+    }
+
+    private Account(AccountId entityId){
+        super(entityId);
+        subscribe(new AccountChange(this));
+    }
+
+    public static Account from(AccountId accountId, List<DomainEvent> events){
+        var account = new Account(accountId);
+        events.forEach(account::applyEvent);
+        return account;
     }
 
     public void updateSubscriptionCardId(SubscriptionCardId subscriptionCardId){
