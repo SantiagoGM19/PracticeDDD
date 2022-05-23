@@ -1,9 +1,14 @@
 package com.practice.adventureSupermarket.ProductDetail;
 
 import co.com.sofka.domain.generic.AggregateEvent;
+import co.com.sofka.domain.generic.DomainEvent;
+import com.practice.adventureSupermarket.Invoice.Invoice;
+import com.practice.adventureSupermarket.Invoice.InvoiceChange;
+import com.practice.adventureSupermarket.Invoice.values.InvoiceId;
 import com.practice.adventureSupermarket.ProductDetail.events.*;
 import com.practice.adventureSupermarket.ProductDetail.values.*;
 
+import java.util.List;
 import java.util.Objects;
 
 public class ProductDetail extends AggregateEvent<ProductDetailId> {
@@ -16,6 +21,17 @@ public class ProductDetail extends AggregateEvent<ProductDetailId> {
     public ProductDetail(ProductDetailId entityId, Description description, Amount amount) {
         super(entityId);
         appendChange(new ProductDetailCreated(description, amount)).apply();
+    }
+
+    private ProductDetail(ProductDetailId entityId){
+        super(entityId);
+        subscribe(new ProductDetailChange(this));
+    }
+
+    public static ProductDetail from(ProductDetailId productDetailId, List<DomainEvent> events){
+        var productDetail = new ProductDetail(productDetailId);
+        events.forEach(productDetail::applyEvent);
+        return productDetail;
     }
 
     public void updateProductId(ProductId productId){
